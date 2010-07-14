@@ -1779,6 +1779,17 @@ int ArchiveFile(const char *filepath, const char *archive_dir)
     if(!filepath || !archive_dir)
         return -1;  /* Invalid argument */
 
+    if (strncmp(archive_dir, "/dev/null", 9) == 0) 
+    {
+        if (unlink(filepath) != 0)
+        {
+            LogMessage("Failed to remove file \"%s\": %s", 
+                       filepath, strerror(errno));
+            return -1;
+        }
+        return 0;
+    }
+
     /* Archive the file */
     dest_len = strlen(archive_dir) + 1 + strlen(strrchr(filepath, '/') + 1);
     dest = (char *)SnortAlloc(dest_len + 1);
