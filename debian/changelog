@@ -1,3 +1,9 @@
+barnyard2 (2.1.8+vyatta+2) unstable; urgency=low
+
+  * Fix changelog version.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Wed, 28 Jul 2010 14:45:02 -0700
+
 barnyard2 (2.1.8+vyatta+1) unstable; urgency=low
 
   * Initial Release.
