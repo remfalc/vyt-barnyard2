@@ -10,7 +10,7 @@ Standards-Version: 3.8.0
 Homepage: http://www.securixlive.com/barnyard2/
 
 Package: barnyard2
-Architecture: i386
+Architecture: any
 Depends: libc6, 
  snort | vyatta-snort,
  libmysqlclient15off
