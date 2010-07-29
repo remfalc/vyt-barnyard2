@@ -1,3 +1,10 @@
+barnyard2 (2.1.8+vyatta+1+larkspur+3) unstable; urgency=low
+
+  * fix autotool problem
+  * remove build generated file
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Thu, 29 Jul 2010 14:34:56 -0700
+
 barnyard2 (2.1.8+vyatta+1+larkspur+2) unstable; urgency=low
 
   * Add prelude build dependency.
