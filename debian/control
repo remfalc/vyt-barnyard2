@@ -4,7 +4,8 @@ Priority: extra
 Maintainer: Vyatta Package Maintainers <maintainers@vyatta.com>
 Build-Depends: debhelper (>= 5), 
  autotools-dev, 
- libmysqlclient15-dev
+ libmysqlclient15-dev,
+ libprelude-dev
 Standards-Version: 3.8.0
 Homepage: http://www.securixlive.com/barnyard2/
 
