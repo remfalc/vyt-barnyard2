@@ -1,3 +1,9 @@
+barnyard2 (2.1.8+vyatta+1+larkspur+2) unstable; urgency=low
+
+  * Add prelude build dependency.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Thu, 29 Jul 2010 11:33:42 -0700
+
 barnyard2 (2.1.8+vyatta+1+larkspur+1) unstable; urgency=low
 
   * UNRELEASED
