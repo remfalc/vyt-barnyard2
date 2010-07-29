@@ -2,10 +2,8 @@
 
 
 rm -rf config
-rm -f aclocal.m4 config.guess config.statusconfig.sub configure INSTALL
+rm -f aclocal.m4 config.guess config.status config.sub configure INSTALL
 
-autoreconf --force --install
+export ACLOCAL='aclocal -I m4'
+autoreconf --force --install --symlink
 
-rm -f config.sub config.guess
-ln -s /usr/share/misc/config.sub .
-ln -s /usr/share/misc/config.guess .
