@@ -1,3 +1,17 @@
+barnyard2 (2.1.8+vyatta+3) unstable; urgency=low
+
+  [ Stig Thormodsrud ]
+  * Add prelude build dependency.
+
+  [ An-Cheng Huang ]
+  * fix autotool problem
+  * remove build generated file
+  * fix 64-bit build
+
+  [ Stig Thormodsrud ]
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Thu, 26 Aug 2010 16:51:34 -0700
+
 barnyard2 (2.1.8+vyatta+2) unstable; urgency=low
 
   * Fix changelog version.
