@@ -18,7 +18,11 @@ config.status
 config.sub
 configure
 cppflags.out
+missing
+ltmain.sh
+install-sh
 debian/barnyard2.debhelper.log
+debian/barnyard2.substvars
 debian/barnyard2/
 debian/files
 libtool

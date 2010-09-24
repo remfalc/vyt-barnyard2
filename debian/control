@@ -4,7 +4,7 @@ Priority: extra
 Maintainer: Vyatta Package Maintainers <maintainers@vyatta.com>
 Build-Depends: debhelper (>= 5), 
  autotools-dev, 
- libmysqlclient15-dev,
+ libmysqlclient-dev,
  libprelude-dev
 Standards-Version: 3.8.0
 Homepage: http://www.securixlive.com/barnyard2/
@@ -13,7 +13,7 @@ Package: barnyard2
 Architecture: any
 Depends: libc6, 
  snort | vyatta-snort,
- libmysqlclient15off
+ libmysqlclient16
 Description: The barnyard2 package is a fork of the original barnyard project, 
  designed specifically for Snort's new unified2 file format.  Offloads 
  output processing of your Snort alert files to a dedicated process, 

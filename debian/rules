@@ -26,6 +26,7 @@ configure	+= --prefix=/usr
 configure	+= --infodir=\$${prefix}/share/info
 configure       += --sysconfdir=/etc/snort
 configure       += --with-mysql
+configure       += --enable-prelude
 configure	+= CFLAGS="$(CFLAGS)"
 
 ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
