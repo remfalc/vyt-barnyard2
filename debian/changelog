@@ -1,3 +1,9 @@
+barnyard2 (2.1.8+vyatta+4) unstable; urgency=low
+
+  * Fix barnyard2 build for squeeze.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Thu, 23 Sep 2010 17:44:50 -0700
+
 barnyard2 (2.1.8+vyatta+3) unstable; urgency=low
 
   [ Stig Thormodsrud ]
