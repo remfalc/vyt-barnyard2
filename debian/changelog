@@ -1,3 +1,9 @@
+barnyard2 (2.1.8+vyatta+5) unstable; urgency=low
+
+  * tweak rules for dependencies
+
+ -- An-Cheng Huang <ancheng@vyatta.com>  Thu, 23 Sep 2010 18:06:29 -0700
+
 barnyard2 (2.1.8+vyatta+4) unstable; urgency=low
 
   * Fix barnyard2 build for squeeze.
