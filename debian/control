@@ -11,9 +11,8 @@ Homepage: http://www.securixlive.com/barnyard2/
 
 Package: barnyard2
 Architecture: any
-Depends: libc6, 
- snort | vyatta-snort,
- libmysqlclient16
+Depends: ${shlibs:Depends},
+ snort | vyatta-snort
 Description: The barnyard2 package is a fork of the original barnyard project, 
  designed specifically for Snort's new unified2 file format.  Offloads 
  output processing of your Snort alert files to a dedicated process, 
