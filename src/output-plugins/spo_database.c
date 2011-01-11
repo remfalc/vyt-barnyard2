@@ -137,11 +137,16 @@ typedef struct _SharedDatabaseData
     int       cid;
     int       reference;
     int       use_ssl;
+#ifdef ENABLE_POSTGRESQL
+    char     *ssl_mode;
+#endif
+#ifdef ENABLE_MYSQL
     char     *ssl_key;
     char     *ssl_cert;
     char     *ssl_ca;
     char     *ssl_ca_path;
     char     *ssl_cipher;
+#endif
 } SharedDatabaseData;
 
 typedef struct _DatabaseData
@@ -228,12 +233,21 @@ typedef struct _SharedDatabaseDataNode
 #define KEYWORD_IGNOREBPF_YES  "yes"
 #define KEYWORD_IGNOREBPF_ONE  "1"
 
-#define KEYWORD_SSL_KEY     "ssl_key"
-#define KEYWORD_SSL_CERT    "ssl_cert"
-#define KEYWORD_SSL_CA      "ssl_ca"
-#define KEYWORD_SSL_CA_PATH "ssl_ca_path"
-#define KEYWORD_SSL_CIPHER  "ssl_cipher"
+#ifdef ENABLE_MYSQL
+#   define KEYWORD_SSL_KEY     "ssl_key"
+#   define KEYWORD_SSL_CERT    "ssl_cert"
+#   define KEYWORD_SSL_CA      "ssl_ca"
+#   define KEYWORD_SSL_CA_PATH "ssl_ca_path"
+#   define KEYWORD_SSL_CIPHER  "ssl_cipher"
+#endif
 
+#ifdef ENABLE_POSTGRESQL
+#   define KEYWORD_SSL_MODE  "ssl_mode"
+#   define KEYWORD_SSL_MODE_DISABLE "disable"
+#   define KEYWORD_SSL_MODE_ALLOW   "allow"
+#   define KEYWORD_SSL_MODE_PREFER  "prefer"
+#   define KEYWORD_SSL_MODE_REQUIRE "require"
+#endif
 
 #define LATEST_DB_SCHEMA_VERSION 107
 
@@ -676,7 +690,8 @@ void DatabaseInitFinalize(int unused, void *arg)
                         event_cid);
         }
 
-        data->shared->cid = event_cid;
+        /* ensure we use the largest cid possible and not just the MAX(cid) */
+        data->shared->cid = event_cid > sensor_cid ? event_cid : sensor_cid;
         ++(data->shared->cid);
     }
     else
@@ -779,6 +794,7 @@ void DatabaseInitFinalize(int unused, void *arg)
     if (data->sensor_name != NULL)
     LogMessage("database:    sensor name = %s\n", data->sensor_name);
     LogMessage("database:      sensor id = %u\n", data->shared->sid);
+    LogMessage("database:     sensor cid = %u\n", data->shared->cid);
 
     if (data->encoding == ENCODING_HEX)
     LogMessage("database:  data encoding = %s\n", KEYWORD_ENCODING_HEX);
@@ -797,6 +813,7 @@ void DatabaseInitFinalize(int unused, void *arg)
     else
     LogMessage("database:     ignore_bpf = %s\n", KEYWORD_IGNOREBPF_NO);
 
+#ifdef ENABLE_MYSQL
     if (data->shared->ssl_key != NULL)
     LogMessage("database:        ssl_key = %s\n", data->shared->ssl_key);
     if (data->shared->ssl_cert != NULL)
@@ -807,6 +824,11 @@ void DatabaseInitFinalize(int unused, void *arg)
     LogMessage("database:    ssl_ca_path = %s\n", data->shared->ssl_ca_path);
     if (data->shared->ssl_cipher != NULL)
     LogMessage("database:     ssl_cipher = %s\n", data->shared->ssl_cipher);
+#endif
+#ifdef ENABLE_POSTGRESQL
+    if (data->shared->ssl_mode != NULL)
+    LogMessage("database:       ssl_mode = %s\n", data->shared->ssl_mode);
+#endif
 
     if(!strncasecmp(data->facility,"log",3))
     LogMessage("database: using the \"log\" facility\n");
@@ -1030,33 +1052,55 @@ void ParseDatabaseArgs(DatabaseData *data)
             }
 
         }
+
+#ifdef ENABLE_MYSQL
         /* the if/elseif check order is important because the keywords for the */
         /* ca and ca_path are very similar */
-        if(!strncasecmp(dbarg,KEYWORD_SSL_KEY,strlen(KEYWORD_SSL_KEY)))
+        if(!strncasecmp(dbarg, KEYWORD_SSL_KEY, strlen(KEYWORD_SSL_KEY)))
         {
             data->shared->ssl_key = a1;
             data->shared->use_ssl = 1;
         }
-        else if(!strncasecmp(dbarg,KEYWORD_SSL_CERT,strlen(KEYWORD_SSL_CERT)))
+        else if(!strncasecmp(dbarg, KEYWORD_SSL_CERT, strlen(KEYWORD_SSL_CERT)))
         {
             data->shared->ssl_cert = a1;
             data->shared->use_ssl = 1;
         }
-        else if(!strncasecmp(dbarg,KEYWORD_SSL_CA_PATH,strlen(KEYWORD_SSL_CA_PATH)))
+        else if(!strncasecmp(dbarg, KEYWORD_SSL_CA_PATH, strlen(KEYWORD_SSL_CA_PATH)))
         {
             data->shared->ssl_ca_path = a1;
             data->shared->use_ssl = 1;
         }
-        else if(!strncasecmp(dbarg,KEYWORD_SSL_CA,strlen(KEYWORD_SSL_CA)))
+        else if(!strncasecmp(dbarg, KEYWORD_SSL_CA, strlen(KEYWORD_SSL_CA)))
         {
             data->shared->ssl_ca = a1;
             data->shared->use_ssl = 1;
         }
-        else if(!strncasecmp(dbarg,KEYWORD_SSL_CIPHER,strlen(KEYWORD_SSL_CIPHER)))
+        else if(!strncasecmp(dbarg, KEYWORD_SSL_CIPHER, strlen(KEYWORD_SSL_CIPHER)))
         {
-            data->shared->ssl_cipher = a1;
+            data->shared->ssl_key = a1;
             data->shared->use_ssl = 1;
         }
+#endif
+
+#ifdef ENABLE_POSTGRESQL
+        if(!strncasecmp(dbarg, KEYWORD_SSL_MODE, strlen(KEYWORD_SSL_MODE)))
+        {
+            if ( (!strncasecmp(a1, KEYWORD_SSL_MODE_DISABLE, strlen(KEYWORD_SSL_MODE_DISABLE))) ||
+                 (!strncasecmp(a1, KEYWORD_SSL_MODE_ALLOW, strlen(KEYWORD_SSL_MODE_ALLOW))) ||
+                 (!strncasecmp(a1, KEYWORD_SSL_MODE_PREFER, strlen(KEYWORD_SSL_MODE_PREFER))) ||
+                 (!strncasecmp(a1, KEYWORD_SSL_MODE_REQUIRE, strlen(KEYWORD_SSL_MODE_REQUIRE))) )
+            {
+                data->shared->ssl_mode = a1;
+                data->shared->use_ssl = 1;
+            }
+            else
+            {
+                ErrorMessage("database: unknown ssl_mode argument (%s)", a1);
+            }
+        }
+#endif
+
         dbarg = strtok(NULL, "=");
     } 
 
@@ -3122,9 +3166,29 @@ void Connect(DatabaseData * data)
 #ifdef ENABLE_POSTGRESQL
     if( data->shared->dbtype_id == DB_POSTGRESQL )
     {
-        data->p_connection =
-            PQsetdbLogin(data->shared->host,data->port, NULL, NULL,
-                         data->shared->dbname, data->user, data->password);
+        if (data->shared->use_ssl == 1)
+        {
+            data->p_connection =
+                PQsetdbLogin(data->shared->host,
+                             data->port,
+                             data->shared->ssl_mode,
+                             NULL,
+                             data->shared->dbname,
+                             data->user,
+                             data->password);
+        }
+        else
+        {
+            data->p_connection =
+                PQsetdbLogin(data->shared->host,
+                             data->port,
+                             NULL,
+                             NULL,
+                             data->shared->dbname,
+                             data->user,
+                             data->password);
+        }
+
 
         if(PQstatus(data->p_connection) == CONNECTION_BAD)
         {
@@ -3158,7 +3222,6 @@ void Connect(DatabaseData * data)
         /* check if we want to connect with ssl options */
         if (data->shared->use_ssl == 1)
         {
-          DEBUG_WRAP(DebugMessage(DEBUG_LOG,"database(debug): calling ssl with %s, %s, %s, %s, %s\n", data->shared->ssl_key, data->shared->ssl_cert, data->shared->ssl_ca, data->shared->ssl_ca_path, data->shared->ssl_cipher););
             mysql_ssl_set(data->m_sock, data->shared->ssl_key,
                           data->shared->ssl_cert, data->shared->ssl_ca,
                           data->shared->ssl_ca_path, data->shared->ssl_cipher);

@@ -205,7 +205,7 @@ void TimeStats(void);
 
 int ArchiveFile(const char *, const char *);
 
-char *GetUniqueName();
+char *GetUniqueName(char *);
 char *GetIP(char *);
 char *GetHostname();
 int GetLocalTimezone();

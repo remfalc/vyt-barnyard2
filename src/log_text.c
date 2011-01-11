@@ -78,20 +78,23 @@ void LogTimeStamp(TextLog* log, Packet* p)
  * Returns: void function
  *--------------------------------------------------------------------
  */ 
-void LogPriorityData(TextLog* log, uint32_t cid, uint32_t priority, bool doNewLine)
+void LogPriorityData(TextLog* log, uint32_t classification_id, uint32_t priority_id, bool doNewLine)
 {
-	ClassType			*cn = ClassTypeLookupById(barnyard2_conf, cid);
+	ClassType			*cn = ClassTypeLookupById(barnyard2_conf, classification_id);
 
     if ( cn != NULL )
     {
         TextLog_Print(
             log, "[Classification: %s] [Priority: %d] ", 
-            cn->name, priority
+            cn->name, cn->priority
         );
     }
     else
     {
-        TextLog_Print(log, "[Priority: %d] ", priority);
+        TextLog_Print(
+            log, "[Classification ID: %s] [Priority ID: %d] ", 
+            classification_id, priority_id
+        );
     }
     if ( doNewLine )
         TextLog_NewLine(log);
