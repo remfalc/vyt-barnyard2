@@ -144,6 +144,9 @@ bool TextLog_Flush(TextLog* this)
 
     ok = fwrite(this->buf, this->pos, 1, this->file);
 
+    /* on stdout flush after printing to avoid lags in output */
+    if (this->file == stdout ) fflush (this->file) ;
+
     if ( ok == 1 ) 
     {
         this->size += this->pos;

@@ -184,7 +184,7 @@ void SguilInitFinalize(int unused, void *arg)
     /* identify the sensor_name */
     if(ssd_data->sensor_name == NULL)
     {
-		ssd_data->sensor_name = SnortStrdup(GetUniqueName());
+		ssd_data->sensor_name = SnortStrdup(GetUniqueName(PRINT_INTERFACE(barnyard2_conf->interface)));
          if(ssd_data->sensor_name)
          {
             if( ssd_data->sensor_name[strlen(ssd_data->sensor_name)-1] == '\n' )

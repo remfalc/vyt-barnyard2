@@ -151,7 +151,7 @@ void PlatypusInitFinalize(int unused, void *arg)
     /* identify the agent_name */
     if(spd_data->agent_name == NULL)
     {
-		spd_data->agent_name = SnortStrdup(GetUniqueName());
+		spd_data->agent_name = SnortStrdup(GetUniqueName(PRINT_INTERFACE(barnyard2_conf->interface)));
     }
    
 	if (!BcLogQuiet())
@@ -286,27 +286,27 @@ void Platypus(Packet *p, void *event, u_int32_t event_type, void *arg)
     switch(event_type)
     {
         case UNIFIED2_IDS_EVENT:
-            inet_ntop(AF_INET, &((Unified2Event *)event)->ip_source, sip4, INET_ADDRSTRLEN);
-            inet_ntop(AF_INET, &((Unified2Event *)event)->ip_destination, dip4, INET_ADDRSTRLEN);
+            inet_ntop(AF_INET, &((Unified2IDSEvent_legacy *)event)->ip_source, sip4, INET_ADDRSTRLEN);
+            inet_ntop(AF_INET, &((Unified2IDSEvent_legacy *)event)->ip_destination, dip4, INET_ADDRSTRLEN);
 
             SnortSnprintfAppend(evt_msg, MAX_MSG_LEN, "4|%s|%u|%s|%u|%u|",
                 sip4, 
-                ntohs(((Unified2Event *)event)->sport_itype), 
+                ntohs(((Unified2IDSEvent_legacy *)event)->sport_itype), 
                 dip4,
-                ntohs(((Unified2Event *)event)->dport_icode), 
-                ((Unified2Event *)event)->protocol);
+                ntohs(((Unified2IDSEvent_legacy *)event)->dport_icode), 
+                ((Unified2IDSEvent_legacy *)event)->protocol);
             break;
 #ifdef SUP_IP6
         case UNIFIED2_IDS_EVENT_IPV6:
-            inet_ntop(AF_INET6, &((Unified2Event6 *)event)->ip_source, sip6, INET6_ADDRSTRLEN);
-            inet_ntop(AF_INET6, &((Unified2Event6 *)event)->ip_destination, dip6, INET6_ADDRSTRLEN);
+            inet_ntop(AF_INET6, &((Unified2IDSEvent6_legacy *)event)->ip_source, sip6, INET6_ADDRSTRLEN);
+            inet_ntop(AF_INET6, &((Unified2IDSEvent6_legacy *)event)->ip_destination, dip6, INET6_ADDRSTRLEN);
 
             SnortSnprintfAppend(evt_msg, MAX_MSG_LEN, "6|%s|%u|%s|%u|%u|",
                 sip6,
-                ntohs(((Unified2Event6 *)event)->sport_itype),
+                ntohs(((Unified2IDSEvent6_legacy *)event)->sport_itype),
                 dip6,
-                ntohs(((Unified2Event6 *)event)->dport_icode),
-                ((Unified2Event6 *)event)->protocol);
+                ntohs(((Unified2IDSEvent6_legacy *)event)->dport_icode),
+                ((Unified2IDSEvent6_legacy *)event)->protocol);
             break;
 #endif
         default:
@@ -407,11 +407,16 @@ int PlatypusAgentEventSend(SpoPlatypusData *data, char *msg)
 
         /* parse the reply */
         toks = mSplit(rcv_msg, "|", 2, &num_toks, 0);
-        if( ! ( strncasecmp(toks[0], "BY2_EVT_CFM", 11) == 0 &&
-                (num_toks == 2) &&
-                (atoi(toks[1]) != data->event_id) ) )
+        if( strncasecmp(toks[0], "BY2_EVT_CFM", 11) != 0 )
         {
             FatalError("platypus: expected BY2_EVT_CFM|%u and got: \"%s\"\n", data->event_id, rcv_msg);
+        }
+        else
+        {
+            if ( (num_toks == 2) && (atoi(toks[1]) != data->event_id) )
+            {
+                FatalError("platypus: expected BY2_EVT_CFM|%u and got: \"%s\" (%u)\n", data->event_id, rcv_msg, atoi(toks[1]));
+            }
         }
 
         mSplitFree(&toks, num_toks);
@@ -726,7 +731,7 @@ int PlatypusAgentReceive(SpoPlatypusData *spd_data, char *in)
 			}
 
 			/* copy line into 'in' */
-			while( *(rcv_msg+rcv_idx) != 0x0A && rcv_idx < rcv_len )
+			while( *(rcv_msg+rcv_idx) != 0x0a && rcv_idx < rcv_len )
 			{
 				memcpy(in+in_off, rcv_msg+rcv_idx, 1);
 				in_off++;
