@@ -207,6 +207,46 @@ Arguments:
                 [yes|1]: Ignore the BPF part when looking for the server
                          definition
 
+
+
+        MYSQL ONLY
+
+        ssl_key - the name of the SSL key file to use for establishing a secure
+             connection.
+
+        ssl_cert - the path of the SSL certificate file to user for establishing
+             a secure connection.
+
+        ssl_ca - the path to a file that contains a list of trusted SSL CAs.
+
+        ssl_ca_path - The path to a directory that contains trusted SSL CA
+             certificates in PEM format.
+
+        ssl_cipher - A list of allowable ciphers to user for SSL encryption. For
+             greatest portability, the cipher list should be of one or more
+             cipher namges, separated by colons. Examples:
+
+             ssl_cipher=AES128-SHA
+             ssl_cipher=DHE-RSA-AES256-SHA:AES128-SHA
+
+             If no cipher in the list is supported, SSL connections will not work.
+
+
+        POSTGRESQL ONLY
+
+        ssl_mode - SSL requirement for connection to the postgresql server
+
+                [disable]: will attempt only an unencrypted SSL connection.
+
+                [allow]: will negotiate, trying first a non-SSL connection, then
+                         if it fails, tryin an SSL connection.
+
+                [prefer]: (default) will negotiate, trying first an SSL
+                          connection, then if that fails, trying a regular
+                          non-SSL connection.
+
+                [require]: will try only an SSL connection.
+
    The configuration I am currently using is MySQL with the database
    name of "snort". The user "snortusr@localhost" has INSERT and SELECT
    privileges on the "snort" database and requires a password of

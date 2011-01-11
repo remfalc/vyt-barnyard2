@@ -1,3 +1,22 @@
+2010-12-27 - Barnyard 2.1.9
+  [*] Additions
+     * spo_database. Support of encrypted connections to postgresql is now
+       available. See README.database for the appropriate options.
+
+     * spo_sguil. Fixed issue with duplication of alerts.
+
+  [*] Improvements
+
+     * spooler. Fixed issue with borking when reading unrecognised records.
+       There is now sufficient information to skip and move on.
+
+     * spooler. Fixed early termination of non-readable files, causing the
+       dreaded SEGFAULT.
+
+     * classifications. Tweaked output for classification identification if the
+       appropriate node can't be found.
+
+
 2010-03-05 - Barnyard 2.1.8
   [*] Additions
      * spo_database. Support of encrypted connections to mysql is now available.
