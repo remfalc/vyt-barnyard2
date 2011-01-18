@@ -174,6 +174,25 @@ int Unified2ReadRecord(void *sph)
     DEBUG_WRAP(DebugMessage(DEBUG_LOG,"Reading record type=%u (%u bytes)\n", 
                 record_type, record_length););
 
+    switch (record_type)
+    {
+       case UNIFIED2_EVENT:
+       case UNIFIED2_PACKET:
+       case UNIFIED2_IDS_EVENT:
+       case UNIFIED2_EVENT_EXTENDED:
+       case UNIFIED2_PERFORMANCE:
+       case UNIFIED2_PORTSCAN:
+       case UNIFIED2_IDS_EVENT_IPV6:
+       case UNIFIED2_IDS_EVENT_MPLS:
+       case UNIFIED2_IDS_EVENT_IPV6_MPLS:
+       case UNIFIED2_IDS_EVENT_VLAN:
+       case UNIFIED2_IDS_EVENT_IPV6_VLAN:
+       case UNIFIED2_EXTRA_DATA:
+          break;
+       default:
+          FatalError("Unknow record type: %d\n", record_type);
+    }
+
     if(!spooler->record.data)
     {
         /* SnortAlloc will FatalError if memory can't be assigned */
