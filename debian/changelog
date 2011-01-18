@@ -1,3 +1,9 @@
+barnyard2 (2.1.8+vyatta+5+mendocino3) unstable; urgency=low
+
+  * Add validation of unified2 type.
+
+ -- Stig Thormodsrud <stig@vyatta.com>  Tue, 18 Jan 2011 14:09:10 -0800
+
 barnyard2 (2.1.8+vyatta+5+mendocino2) unstable; urgency=low
 
   * merge barnyard2 2-1.9 from upstream
